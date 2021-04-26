@@ -1,21 +1,21 @@
 package com.keisuki.reactive;
 
 import com.keisuki.reactive.foundation.Component;
-import java.util.concurrent.BlockingQueue;
+import com.keisuki.reactive.foundation.MessageSink;
 
 public class Counter implements Component {
-  private final BlockingQueue<? super Integer> queue;
+  private final MessageSink<? super Integer> sink;
 
   private int counter = 0;
 
-  public Counter(final BlockingQueue<? super Integer> queue) {
-    this.queue = queue;
+  public Counter(final MessageSink<? super Integer> sink) {
+    this.sink = sink;
   }
 
 
   @Override
   public void run() throws Exception {
     Thread.sleep(1000);
-    queue.add(counter++);
+    sink.send(counter++);
   }
 }
