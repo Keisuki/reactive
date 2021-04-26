@@ -12,7 +12,11 @@ public class MessageQueue<T> implements MessageSource<T>, MessageSink<T> {
 
   @Override
   public void send(T message) {
-    queue.add(message);
+    try {
+      queue.add(message);
+    } catch (final IllegalStateException ex) {
+      throw new CouldNotAcceptMessage(message, ex);
+    }
   }
 
   @Override

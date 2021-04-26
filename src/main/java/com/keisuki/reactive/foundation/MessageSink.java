@@ -5,5 +5,8 @@ package com.keisuki.reactive.foundation;
  * type
  */
 public interface MessageSink<T> {
-  void send(final T message);
+  /**
+   * Send the given message to this sink if possible.
+   */
+  void send(final T message) throws CouldNotAcceptMessage;
 }

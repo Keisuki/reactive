@@ -5,5 +5,9 @@ package com.keisuki.reactive.foundation;
  * type
  */
 public interface MessageSource<T> {
+  /**
+   * Receive the next message from this source.  If one is not readily available, this method blocks
+   * until one becomes available.
+   */
   T next() throws InterruptedException;
 }
