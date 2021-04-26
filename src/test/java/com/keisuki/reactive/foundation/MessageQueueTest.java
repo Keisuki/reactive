@@ -5,9 +5,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +16,7 @@ class MessageQueueTest {
 
   @BeforeEach
   void setUp() {
-    executorService = new ThreadPoolExecutor(
-        1, 3, 5, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+    executorService = TestUtils.createExecutorService(1);
     queue = new MessageQueue<>(2);
   }
 
