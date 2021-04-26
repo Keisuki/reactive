@@ -1,5 +1,6 @@
 package com.keisuki.reactive;
 
+import com.keisuki.reactive.foundation.Component;
 import java.util.concurrent.BlockingQueue;
 
 public class Counter implements Component {

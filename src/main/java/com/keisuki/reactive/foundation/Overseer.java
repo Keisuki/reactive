@@ -1,4 +1,4 @@
-package com.keisuki.reactive;
+package com.keisuki.reactive.foundation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

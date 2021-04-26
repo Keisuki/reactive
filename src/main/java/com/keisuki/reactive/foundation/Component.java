@@ -1,4 +1,4 @@
-package com.keisuki.reactive;
+package com.keisuki.reactive.foundation;
 
 @FunctionalInterface
 public interface Component {
