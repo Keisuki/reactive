@@ -12,10 +12,11 @@ public class Counter implements Component {
     this.sink = sink;
   }
 
-
   @Override
   public void run() throws Exception {
-    Thread.sleep(1000);
-    sink.send(counter++);
+    if (sink.canAcceptMessages()) {
+      sink.send(counter++);
+      Thread.sleep(1000);
+    }
   }
 }

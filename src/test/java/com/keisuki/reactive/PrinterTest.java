@@ -1,10 +1,13 @@
-package com.keisuki.reactive.foundation;
+package com.keisuki.reactive;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import com.keisuki.reactive.Printer;
+import com.keisuki.reactive.foundation.MessageQueue;
+import com.keisuki.reactive.foundation.MessageSink;
+import com.keisuki.reactive.util.Eventually;
+import com.keisuki.reactive.util.TestUtils;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import org.junit.jupiter.api.AfterEach;
@@ -12,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class PrinterTest {
   private MessageSink<Object> sink;

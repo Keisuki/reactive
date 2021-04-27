@@ -10,4 +10,10 @@ public interface MessageSource<T> {
    * until one becomes available.
    */
   T next() throws InterruptedException;
+
+  /**
+   * Apply backpressure to any sinks affecting this source, telling them to stop sending more
+   * messages
+   */
+  void stopMessages(boolean stop);
 }

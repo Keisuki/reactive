@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.keisuki.reactive.util.TestUtils;
 import java.util.concurrent.ExecutorService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,5 +78,37 @@ class MessageQueueTest {
     queue.send(new Object());
 
     assertThrows(CouldNotAcceptMessage.class, () -> queue.send(new Object()));
+  }
+
+  @Test
+  @DisplayName("By default, the queue reports that it accepts messages")
+  void testCanAcceptMessages() {
+    assertThat(queue.canAcceptMessages(), is(true));
+  }
+
+  @Test
+  @DisplayName("If the queue is at capacity, it reports that it does not accept messages")
+  void testCanAcceptMessagesFull() {
+    queue.send(new Object());
+    queue.send(new Object());
+
+    assertThat(queue.canAcceptMessages(), is(false));
+  }
+
+  @Test
+  @DisplayName("If backpressure is applied, the queue reports that it does not accept messages")
+  void testBackpressure() {
+    queue.stopMessages(true);
+
+    assertThat(queue.canAcceptMessages(), is(false));
+  }
+
+  @Test
+  @DisplayName("If backpressure is released, the queue reports that it accepts messages")
+  void testBackpressureOff() {
+    queue.stopMessages(true);
+    queue.stopMessages(false);
+
+    assertThat(queue.canAcceptMessages(), is(true));
   }
 }

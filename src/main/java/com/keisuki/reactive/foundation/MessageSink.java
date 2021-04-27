@@ -9,4 +9,9 @@ public interface MessageSink<T> {
    * Send the given message to this sink if possible.
    */
   void send(final T message) throws CouldNotAcceptMessage;
+
+  /**
+   * Check for backpressure from any downstream components.
+   */
+  boolean canAcceptMessages();
 }

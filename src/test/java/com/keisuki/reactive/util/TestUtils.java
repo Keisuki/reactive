@@ -1,5 +1,6 @@
-package com.keisuki.reactive.foundation;
+package com.keisuki.reactive.util;
 
+import com.keisuki.reactive.foundation.Component;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;

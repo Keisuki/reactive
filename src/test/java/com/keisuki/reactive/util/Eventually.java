@@ -1,4 +1,4 @@
-package com.keisuki.reactive.foundation;
+package com.keisuki.reactive.util;
 
 import java.time.Instant;
 import java.time.temporal.TemporalUnit;
