@@ -21,6 +21,9 @@ public class SimpleRoute implements Component {
   @Override
   public void run() throws Exception {
     final HttpRequest request = requests.next();
-    responses.send(new HttpResponse(request.getUuid(), HttpStatus.OK));
+    responses.send(HttpResponse.newBuilder(request.getUuid(), HttpStatus.OK)
+        .withHeader("X-Custom-Header", "Value")
+        .withBody("Response body")
+        .build());
   }
 }

@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -133,7 +134,7 @@ class HttpServerTest {
     Thread.sleep(100);
 
     final HttpRequest request = receivedRequests.get(0);
-    responses.send(new HttpResponse(request.getUuid(), HttpStatus.OK));
+    responses.send(HttpResponse.newBuilder(request.getUuid(), HttpStatus.OK).build());
     assertThat(responseFuture.get(2, TimeUnit.SECONDS).code(), is(200));
   }
 
