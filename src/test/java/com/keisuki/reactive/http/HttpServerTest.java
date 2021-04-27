@@ -1,7 +1,10 @@
 package com.keisuki.reactive.http;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.core.Is.is;
 
 import com.keisuki.reactive.foundation.MessageQueue;
@@ -84,7 +87,7 @@ class HttpServerTest {
   }
 
   @Test
-  @DisplayName("Received messages are parsed correctly")
+  @DisplayName("Multiple http requests can be received")
   void testParseMethodAndPath() throws InterruptedException {
     http.newCall(new Request.Builder()
         .get()
@@ -109,9 +112,12 @@ class HttpServerTest {
         8,
         ChronoUnit.SECONDS,
         () -> assertThat(receivedRequests, containsInAnyOrder(
-            new HttpRequest("GET", "/"),
-            new HttpRequest("POST", "/submitData"),
-            new HttpRequest("DELETE", "/data/123"))));
+            both(hasProperty("method", equalTo("GET")))
+                .and(hasProperty("path", equalTo("/"))),
+            both(hasProperty("method", equalTo("POST")))
+                .and(hasProperty("path", equalTo("/submitData"))),
+            both(hasProperty("method", equalTo("DELETE")))
+                .and(hasProperty("path", equalTo("/data/123"))))));
   }
 
   @Test

@@ -35,19 +35,20 @@ public class HttpRequest {
       return false;
     }
     HttpRequest request = (HttpRequest) o;
-    return Objects.equals(method, request.method)
-        && Objects.equals(path, request.path);
+    return Objects.equals(uuid, request.uuid) && Objects
+        .equals(method, request.method) && Objects.equals(path, request.path);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(method, path);
+    return Objects.hash(uuid, method, path);
   }
 
   @Override
   public String toString() {
     return "HttpRequest{" +
-        "method='" + method + '\'' +
+        "uuid=" + uuid +
+        ", method='" + method + '\'' +
         ", path='" + path + '\'' +
         '}';
   }
