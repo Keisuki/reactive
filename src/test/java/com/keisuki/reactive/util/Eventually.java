@@ -16,7 +16,7 @@ public class Eventually {
     while (Instant.now().isBefore(cutOffTime)) {
       try {
         condition.assertMet();
-      } catch (final Exception ex) {
+      } catch (final Throwable ex) {
         throw new AssertionError("Condition not met", ex);
       }
     }
@@ -26,7 +26,7 @@ public class Eventually {
       final long timeout,
       final TemporalUnit unit,
       final EventuallyCondition condition) {
-    final Exception ex = checkConditionUntilTimeout(timeout, unit, condition);
+    final Throwable ex = checkConditionUntilTimeout(timeout, unit, condition);
     if (ex != null) {
       throw new AssertionError("Condition not met", ex);
     }
@@ -36,24 +36,24 @@ public class Eventually {
       final long timeout,
       final TemporalUnit unit,
       final EventuallyCondition condition) {
-    final Exception ex = checkConditionUntilTimeout(timeout, unit, condition);
+    final Throwable ex = checkConditionUntilTimeout(timeout, unit, condition);
     if (ex == null) {
       throw new AssertionError("Condition met");
     }
   }
 
-  private static Exception checkConditionUntilTimeout(
+  private static Throwable checkConditionUntilTimeout(
       final long timeout,
       final TemporalUnit unit,
       final EventuallyCondition condition) {
     final Instant cutOffTime = Instant.now().plus(timeout, unit);
-    Exception lastFailure = null;
+    Throwable lastFailure = null;
 
     while (Instant.now().isBefore(cutOffTime)) {
       try {
         condition.assertMet();
         return null;
-      } catch (final Exception ex) {
+      } catch (final Throwable ex) {
         lastFailure = ex;
       }
     }
