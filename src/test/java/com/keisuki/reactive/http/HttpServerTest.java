@@ -134,8 +134,10 @@ class HttpServerTest {
     Thread.sleep(100);
 
     final HttpRequest request = receivedRequests.get(0);
-    responses.send(HttpResponse.newBuilder(request.getUuid(), HttpStatus.OK).build());
-    assertThat(responseFuture.get(2, TimeUnit.SECONDS).code(), is(200));
+    responses.send(HttpResponse.newBuilder(request.getUuid(), HttpStatus.OK)
+        .withBody("Success")
+        .build());
+    assertThat(responseFuture.get(120, TimeUnit.SECONDS).code(), is(200));
   }
 
   private Callback okHttpCallback(final CompletableFuture<Response> future) {
