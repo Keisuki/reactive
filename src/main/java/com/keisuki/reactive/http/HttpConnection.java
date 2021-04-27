@@ -29,19 +29,15 @@ class HttpConnection {
   }
 
   void sendResponseAndCloseConnection(final HttpResponse response) {
-    final String result = "HTTP/1.1 " + response.getStatus().getStatusCode() + " "
-        + response.getStatus().getMessage() + "\r\n\r\ndata here";
     channel.write(ByteBuffer.wrap(
-        result.getBytes(StandardCharsets.UTF_8)),
+        response.toData().getBytes(StandardCharsets.UTF_8)),
         null,
         IOUtils.completionHandler(this::closeConnection, this::closeConnection));
   }
 
   private void handleData(final int count, final ByteBuffer buffer) {
     final String data = new String(buffer.array(), StandardCharsets.UTF_8);
-    final String[] lines = data.split("\n");
-    final String[] firstLine = lines[0].split(" ");
-    request = new HttpRequest(firstLine[0], firstLine[1]);
+    request = HttpRequest.parseFrom(data);
   }
 
   private <A, T> void closeConnection(final T value, final A attachment) {

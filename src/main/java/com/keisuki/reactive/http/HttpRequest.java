@@ -52,4 +52,10 @@ public class HttpRequest {
         ", path='" + path + '\'' +
         '}';
   }
+
+  static HttpRequest parseFrom(final String data) {
+    final String[] lines = data.split("\n");
+    final String[] firstLine = lines[0].split(" ");
+    return new HttpRequest(firstLine[0], firstLine[1]);
+  }
 }

@@ -44,4 +44,8 @@ public class HttpResponse {
         ", status=" + status +
         '}';
   }
+
+  String toData() {
+    return "HTTP/1.1 " + status.getStatusCode() + " " + status.getMessage() + "\r\n\r\ndata here";
+  }
 }
