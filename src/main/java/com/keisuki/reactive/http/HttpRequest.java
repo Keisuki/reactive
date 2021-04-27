@@ -1,14 +1,21 @@
 package com.keisuki.reactive.http;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class HttpRequest {
+  private final UUID uuid;
   private final String method;
   private final String path;
 
   public HttpRequest(final String method, final String path) {
+    uuid = UUID.randomUUID();
     this.method = method;
     this.path = path;
+  }
+
+  public UUID getUuid() {
+    return uuid;
   }
 
   public String getMethod() {

@@ -32,6 +32,11 @@ public class MessageQueue<T> implements MessageSource<T>, MessageSink<T> {
   }
 
   @Override
+  public T nextNonBlocking() {
+    return queue.poll();
+  }
+
+  @Override
   public void stopMessages(boolean stop) {
     stopMessages = stop;
   }

@@ -12,6 +12,11 @@ public interface MessageSource<T> {
   T next() throws InterruptedException;
 
   /**
+   * Receive the next message from this source, or null if one is not readily available
+   */
+  T nextNonBlocking();
+
+  /**
    * Apply backpressure to any sinks affecting this source, telling them to stop sending more
    * messages
    */
