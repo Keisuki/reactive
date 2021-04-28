@@ -10,20 +10,24 @@ import com.keisuki.reactive.http.HttpStatus;
 public class SimpleRoute implements Component {
   private final MessageSource<HttpRequest> requests;
   private final MessageSink<HttpResponse> responses;
+  private final HttpStatus status;
+  private final String response;
 
   public SimpleRoute(
       final MessageSource<HttpRequest> requests,
-      final MessageSink<HttpResponse> responses) {
+      final MessageSink<HttpResponse> responses,
+      HttpStatus status, final String response) {
     this.requests = requests;
     this.responses = responses;
+    this.status = status;
+    this.response = response;
   }
 
   @Override
   public void run() throws Exception {
     final HttpRequest request = requests.next();
-    responses.send(HttpResponse.newBuilder(request.getUuid(), HttpStatus.OK)
-        .withHeader("X-Custom-Header", "Value")
-        .withBody("Response body")
+    responses.send(HttpResponse.newBuilder(request.getUuid(), status)
+        .withBody(response)
         .build());
   }
 }
