@@ -1,5 +1,6 @@
 package com.keisuki.reactive.http;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -61,7 +62,8 @@ public class HttpResponse {
 
     final String headerLines = headers.getParameters().entrySet()
         .stream()
-        .map(entry -> Stream.of(entry.getValue())
+        .map(entry -> entry.getValue()
+            .stream()
             .map(value -> entry.getKey() + ": " + value)
             .collect(Collectors.joining("\r\n")))
         .collect(Collectors.joining("\r\n"));
@@ -98,18 +100,13 @@ public class HttpResponse {
       return this;
     }
 
-    public Builder withHeader(final String key, final String[] value) {
+    public Builder withHeader(final String key, final List<String> value) {
       headers.withValue(key, value);
       return this;
     }
 
     public Builder withHeaders(final Map<String, String> headers) {
       this.headers.withValues(headers);
-      return this;
-    }
-
-    public Builder withHeaderArrays(final Map<String, String[]> headers) {
-      this.headers.withValueArrays(headers);
       return this;
     }
 

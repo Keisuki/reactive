@@ -16,25 +16,24 @@ public class Parameters {
 
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
   
-  private final Map<String, String[]> parameters;
+  private final Map<String, List<String>> parameters;
 
-  private Parameters(final Map<String, String[]> parameters) {
+  private Parameters(final Map<String, List<String>> parameters) {
     this.parameters = parameters;
   }
   
   public Optional<String> get(final String key) {
     return Optional.ofNullable(parameters.get(key))
-        .filter(array -> array.length > 0)
-        .map(array -> array[0]);
+        .filter(list -> !list.isEmpty())
+        .map(list -> list.get(0));
   }
   
   public List<String> getAll(final String key) {
     return Optional.ofNullable(parameters.get(key))
-        .map(Arrays::asList)
         .orElseGet(Collections::emptyList);
   }
 
-  Map<String, String[]> getParameters() {
+  Map<String, List<String>> getParameters() {
     return parameters;
   }
 
@@ -63,7 +62,7 @@ public class Parameters {
   }
 
   public Builder toBuilder() {
-    return newBuilder().withValueArrays(parameters);
+    return newBuilder().withValueLists(parameters);
   }
   
   public static Parameters empty() {
@@ -84,8 +83,8 @@ public class Parameters {
       return this;
     }
 
-    public Builder withValue(final String key, final String[] value) {
-      values.computeIfAbsent(key, k -> new LinkedList<>()).addAll(Arrays.asList(value));
+    public Builder withValue(final String key, final List<String> value) {
+      values.computeIfAbsent(key, k -> new LinkedList<>()).addAll(value);
       return this;
     }
 
@@ -94,7 +93,7 @@ public class Parameters {
       return this;
     }
 
-    public Builder withValueArrays(final Map<String, String[]> values) {
+    public Builder withValueLists(final Map<String, List<String>> values) {
       values.forEach(this::withValue);
       return this;
     }
@@ -104,7 +103,7 @@ public class Parameters {
           .stream()
           .collect(Collectors.toUnmodifiableMap(
               Entry::getKey,
-              entry -> entry.getValue().toArray(EMPTY_STRING_ARRAY))));
+              entry -> Collections.unmodifiableList(entry.getValue()))));
     }
   }
 }

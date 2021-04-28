@@ -1,10 +1,12 @@
 package com.keisuki.reactive.http;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class HttpRequest {
   private final UUID uuid;
@@ -12,6 +14,7 @@ public class HttpRequest {
   private final String method;
   private final String path;
   private final Parameters headers;
+  private final Parameters queryParameters;
   private final String body;
 
   private HttpRequest(
@@ -20,12 +23,14 @@ public class HttpRequest {
       final String method,
       final String path,
       final Parameters headers,
+      final Parameters queryParameters,
       final String body) {
     this.uuid = uuid;
     this.invalidRequest = invalidRequest;
     this.method = method;
     this.path = path;
     this.headers = headers;
+    this.queryParameters = queryParameters;
     this.body = body;
   }
 
@@ -53,6 +58,10 @@ public class HttpRequest {
     return headers;
   }
 
+  public Parameters getQueryParameters() {
+    return queryParameters;
+  }
+
   public Builder toBuilder() {
     if (invalidRequest) {
       throw new UnsupportedOperationException("Cannot transform invalid requests");
@@ -62,6 +71,7 @@ public class HttpRequest {
         .withMethod(method)
         .withPath(path)
         .withHeaders(headers)
+        .withQueryParameters(queryParameters)
         .withBody(body);
   }
 
@@ -106,6 +116,7 @@ public class HttpRequest {
         null,
         null,
         Parameters.empty(),
+        Parameters.empty(),
         null);
   }
 
@@ -117,6 +128,10 @@ public class HttpRequest {
     return new Builder(uuid);
   }
 
+  /**
+   * This way of parsing HTTP requests is massively insecure.  This is just to grow my own
+   * understanding, not to be used in a production environment.
+   */
   static HttpRequest parseFrom(final String data) {
     final String[] lines = data.split("\r\n");
     if (lines.length == 0) {
@@ -130,8 +145,9 @@ public class HttpRequest {
     }
 
     final Builder builder = newBuilder()
-        .withMethod(requestLine[0])
-        .withPath(requestLine[1]);
+        .withMethod(requestLine[0]);
+
+    parsePath(requestLine[1], builder);
 
     int currentLine = 1;
     for (; currentLine < lines.length; currentLine++) {
@@ -160,11 +176,27 @@ public class HttpRequest {
     return builder.build();
   }
 
+  private static void parsePath(final String path, final Builder builder) {
+    final String[] pathAndQueryString = path.split("\\?", 2);
+
+    if (pathAndQueryString.length != 2) {
+      builder.withPath(path);
+      return;
+    }
+
+    builder.withPath(pathAndQueryString[0]);
+    Stream.of(pathAndQueryString[1].split("&"))
+        .map(part -> part.split("=", 2))
+        .filter(part -> part.length == 2)
+        .forEach(part -> builder.withQueryParameter(part[0], part[1]));
+  }
+
   public static class Builder {
     private final UUID uuid;
     private String method;
     private String path;
     private Parameters.Builder headers;
+    private Parameters.Builder queryParameters;
     private String body;
 
     public Builder() {
@@ -174,6 +206,7 @@ public class HttpRequest {
     public Builder(final UUID uuid) {
       this.uuid = uuid;
       headers = Parameters.newBuilder();
+      queryParameters = Parameters.newBuilder();
     }
 
     public Builder withMethod(final String method) {
@@ -191,7 +224,7 @@ public class HttpRequest {
       return this;
     }
 
-    public Builder withHeader(final String key, final String[] value) {
+    public Builder withHeader(final String key, final List<String> value) {
       headers.withValue(key, value);
       return this;
     }
@@ -201,13 +234,18 @@ public class HttpRequest {
       return this;
     }
 
-    public Builder withHeaderArrays(final Map<String, String[]> headers) {
-      this.headers.withValueArrays(headers);
+    public Builder withHeaders(final Parameters headers) {
+      this.headers = headers.toBuilder();
       return this;
     }
 
-    public Builder withHeaders(final Parameters headers) {
-      this.headers = headers.toBuilder();
+    public Builder withQueryParameter(final String key, final String value) {
+      queryParameters.withValue(key, value);
+      return this;
+    }
+
+    public Builder withQueryParameters(final Parameters parameters) {
+      this.queryParameters = parameters.toBuilder();
       return this;
     }
 
@@ -223,6 +261,7 @@ public class HttpRequest {
           method,
           path,
           headers.build(),
+          queryParameters.build(),
           body);
     }
   }
