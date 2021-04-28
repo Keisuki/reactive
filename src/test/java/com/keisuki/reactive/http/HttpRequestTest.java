@@ -29,10 +29,10 @@ class HttpRequestTest {
     assertThat(request.getMethod(), is("POST"));
     assertThat(request.getPath(), is("/test"));
     assertThat(
-        request.getHeader("User-Agent").get(),
+        request.getHeaders().get("User-Agent").get(),
         is("Mozilla/4.0 (compatible; MSIE5.01; Windows NT)"));
-    assertThat(request.getHeader("Host").get(), is("localhost"));
-    assertThat(request.getHeader("Content-Type").get(), is("text/plain"));
+    assertThat(request.getHeaders().get("Host").get(), is("localhost"));
+    assertThat(request.getHeaders().get("Content-Type").get(), is("text/plain"));
     assertThat(request.getBody().get(), is("Request body"));
   }
 }

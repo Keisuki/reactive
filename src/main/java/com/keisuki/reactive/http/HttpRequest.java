@@ -1,24 +1,17 @@
 package com.keisuki.reactive.http;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class HttpRequest {
-  private static final String[] EMPTY_STRING_ARRAY = new String[0];
-
   private final UUID uuid;
   private final boolean invalidRequest;
   private final String method;
   private final String path;
-  private final Map<String, String[]> headers;
+  private final Parameters headers;
   private final String body;
 
   private HttpRequest(
@@ -26,7 +19,7 @@ public class HttpRequest {
       boolean invalidRequest,
       final String method,
       final String path,
-      final Map<String, String[]> headers,
+      final Parameters headers,
       final String body) {
     this.uuid = uuid;
     this.invalidRequest = invalidRequest;
@@ -56,14 +49,8 @@ public class HttpRequest {
     return Optional.ofNullable(body);
   }
 
-  public String[] getHeaders(final String key) {
-    return headers.getOrDefault(key, EMPTY_STRING_ARRAY);
-  }
-
-  public Optional<String> getHeader(final String key) {
-    final String[] headers = getHeaders(key);
-
-    return headers.length == 0 ? Optional.empty() : Optional.ofNullable(headers[0]);
+  public Parameters getHeaders() {
+    return headers;
   }
 
   public Builder toBuilder() {
@@ -74,7 +61,7 @@ public class HttpRequest {
     return newBuilder(uuid)
         .withMethod(method)
         .withPath(path)
-        .withHeaderArrays(headers)
+        .withHeaders(headers)
         .withBody(body);
   }
 
@@ -118,7 +105,7 @@ public class HttpRequest {
         true,
         null,
         null,
-        Map.of(),
+        Parameters.empty(),
         null);
   }
 
@@ -177,7 +164,7 @@ public class HttpRequest {
     private final UUID uuid;
     private String method;
     private String path;
-    private Map<String, List<String>> headers;
+    private Parameters.Builder headers;
     private String body;
 
     public Builder() {
@@ -186,7 +173,7 @@ public class HttpRequest {
 
     public Builder(final UUID uuid) {
       this.uuid = uuid;
-      headers = new LinkedHashMap<>();
+      headers = Parameters.newBuilder();
     }
 
     public Builder withMethod(final String method) {
@@ -200,22 +187,27 @@ public class HttpRequest {
     }
 
     public Builder withHeader(final String key, final String value) {
-      headers.computeIfAbsent(key, k -> new LinkedList<>()).add(value);
+      headers.withValue(key, value);
       return this;
     }
 
     public Builder withHeader(final String key, final String[] value) {
-      headers.computeIfAbsent(key, k -> new LinkedList<>()).addAll(Arrays.asList(value));
+      headers.withValue(key, value);
       return this;
     }
 
     public Builder withHeaders(final Map<String, String> headers) {
-      headers.forEach(this::withHeader);
+      this.headers.withValues(headers);
       return this;
     }
 
     public Builder withHeaderArrays(final Map<String, String[]> headers) {
-      headers.forEach(this::withHeader);
+      this.headers.withValueArrays(headers);
+      return this;
+    }
+
+    public Builder withHeaders(final Parameters headers) {
+      this.headers = headers.toBuilder();
       return this;
     }
 
@@ -230,11 +222,7 @@ public class HttpRequest {
           false,
           method,
           path,
-          headers.entrySet()
-              .stream()
-              .collect(Collectors.toUnmodifiableMap(
-                  Entry::getKey,
-                  entry -> entry.getValue().toArray(new String[0]))),
+          headers.build(),
           body);
     }
   }

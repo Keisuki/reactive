@@ -1,11 +1,6 @@
 package com.keisuki.reactive.http;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,13 +9,13 @@ import java.util.stream.Stream;
 public class HttpResponse {
   private final UUID requestUuid;
   private final HttpStatus status;
-  private final Map<String, String[]> headers;
+  private final Parameters headers;
   private final String body;
 
   private HttpResponse(
       final UUID requestUuid,
       final HttpStatus status,
-      final Map<String, String[]> headers,
+      final Parameters headers,
       final String body) {
     this.requestUuid = requestUuid;
     this.status = status;
@@ -64,7 +59,7 @@ public class HttpResponse {
   String toData() {
     final String statusLine = "HTTP/1.1 " + status.getStatusCode() + " " + status.getMessage();
 
-    final String headerLines = headers.entrySet()
+    final String headerLines = headers.getParameters().entrySet()
         .stream()
         .map(entry -> Stream.of(entry.getValue())
             .map(value -> entry.getKey() + ": " + value)
@@ -78,7 +73,7 @@ public class HttpResponse {
 
   public Builder toBuilder() {
     return newBuilder(requestUuid, status)
-        .withHeaderArrays(headers)
+        .withHeaders(headers)
         .withBody(body);
   }
 
@@ -89,32 +84,37 @@ public class HttpResponse {
   public static class Builder {
     private final UUID uuid;
     private final HttpStatus status;
-    private final Map<String, List<String>> headers;
+    private Parameters.Builder headers;
     private String body;
 
     private Builder(final UUID uuid, final HttpStatus status) {
       this.uuid = uuid;
       this.status = status;
-      headers = new LinkedHashMap<>();
+      headers = Parameters.newBuilder();
     }
 
     public Builder withHeader(final String key, final String value) {
-      headers.computeIfAbsent(key, k -> new LinkedList<>()).add(value);
+      headers.withValue(key, value);
       return this;
     }
 
     public Builder withHeader(final String key, final String[] value) {
-      headers.computeIfAbsent(key, k -> new LinkedList<>()).addAll(Arrays.asList(value));
+      headers.withValue(key, value);
       return this;
     }
 
     public Builder withHeaders(final Map<String, String> headers) {
-      headers.forEach(this::withHeader);
+      this.headers.withValues(headers);
       return this;
     }
 
     public Builder withHeaderArrays(final Map<String, String[]> headers) {
-      headers.forEach(this::withHeader);
+      this.headers.withValueArrays(headers);
+      return this;
+    }
+
+    public Builder withHeaders(final Parameters headers) {
+      this.headers = headers.toBuilder();
       return this;
     }
 
@@ -127,11 +127,7 @@ public class HttpResponse {
       return new HttpResponse(
           uuid,
           status,
-          headers.entrySet()
-              .stream()
-              .collect(Collectors.toUnmodifiableMap(
-                  Entry::getKey,
-                  entry -> entry.getValue().toArray(new String[0]))),
+          headers.build(),
           body);
     }
   }
