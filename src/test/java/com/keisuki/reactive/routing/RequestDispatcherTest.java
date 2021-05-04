@@ -40,7 +40,7 @@ class RequestDispatcherTest {
 
     TestUtils.startComponent(executorService, new RequestDispatcher(
         new MessageQueue<>(1),
-        List.of(new Route("/test", sink)),
+        List.of(new Route("/test", sink, "GET")),
         sink));
 
     Eventually.assertAlways(2, ChronoUnit.SECONDS, () -> verifyZeroInteractions(sink));
@@ -58,8 +58,8 @@ class RequestDispatcherTest {
     TestUtils.startComponent(executorService, new RequestDispatcher(
         input,
         List.of(
-            new Route("^/$", homeSink),
-            new Route("^/login/\\d+$", loginSink)),
+            new Route("^/$", homeSink, "GET"),
+            new Route("^/login/\\d+$", loginSink, "POST")),
         unmatchedSink));
 
     final HttpRequest homeRequest = HttpRequest.newBuilder()
@@ -97,7 +97,7 @@ class RequestDispatcherTest {
     TestUtils.startComponent(executorService, new RequestDispatcher(
         input,
         List.of(
-            new Route("^/$", homeSink)),
+            new Route("^/$", homeSink, "GET")),
         unmatchedSink));
 
     final HttpRequest unmatchedRequest = HttpRequest.newBuilder()

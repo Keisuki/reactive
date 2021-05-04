@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Main {
@@ -30,7 +31,7 @@ public class Main {
     overseer.startComponent(new HttpServer(server, requests, responses));
     overseer.startComponent(new RequestDispatcher(
         requests,
-        List.of(new Route(Pattern.compile("^/$"), rootRequests)),
+        List.of(new Route(Pattern.compile("^/$"), rootRequests, Set.of("GET"))),
         unmatchedRequests));
     overseer.startComponent(new SimpleRoute(
         rootRequests, responses, HttpStatus.OK, "Welcome to Keisuki's reactive http server"));
