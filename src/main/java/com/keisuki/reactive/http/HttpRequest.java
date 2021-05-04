@@ -1,5 +1,7 @@
 package com.keisuki.reactive.http;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +11,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public class HttpRequest {
+  private static final Gson GSON = new Gson();
+
   private final UUID uuid;
   private final boolean invalidRequest;
   private final String method;
@@ -60,6 +64,14 @@ public class HttpRequest {
 
   public Parameters getQueryParameters() {
     return queryParameters;
+  }
+
+  public <T> Optional<T> getBodyAsJson(final Class<T> clazz) {
+    return getBody().map(body -> GSON.fromJson(body, clazz));
+  }
+
+  public <T> Optional<T> getBodyAsJson(final TypeToken<T> type) {
+    return getBody().map(body -> GSON.fromJson(body, type.getType()));
   }
 
   public Builder toBuilder() {
